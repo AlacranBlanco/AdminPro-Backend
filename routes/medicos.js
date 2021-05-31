@@ -3,7 +3,7 @@
     ruta: '/api/medico'
 */
 const { Router } = require('express');
-const { check } = require('express-validator');
+const { body } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
 
 const { validarJWT } = require('../middlewares/validar-jwt');
@@ -23,8 +23,8 @@ router.get( '/', getMedicos );
 router.post( '/',
     [
         validarJWT,
-        check('nombre','El nombre del médico es necesario').not().isEmpty(),
-        check('hospital','El hospital id debe de ser válido').isMongoId(),
+        body('name','El nombre del médico es necesario').not().isEmpty(),
+        body('hospital','El hospital id debe de ser válido').isMongoId(),
         validarCampos
     ], 
     crearMedico 
