@@ -1,12 +1,12 @@
-const { response } = require('express');
+const {response} = require('express');
 
 const Medico = require('../models/medico');
 
-const getMedicos = async(req, res = response) => {
+const getMedicos = async (req, res = response) => {
 
     const medicos = await Medico.find()
-                                .populate('usuario','nombre img')
-                                .populate('hospital','nombre img')
+        .populate('usuario', 'nombre img')
+        .populate('hospital', 'nombre img')
 
 
     res.json({
@@ -28,7 +28,7 @@ const crearMedico = async (req, res = response) => {
 
         const medicoDB = await medico.save();
 
-        
+
         res.json({
             ok: true,
             medico: medicoDB
@@ -45,20 +45,66 @@ const crearMedico = async (req, res = response) => {
 
 }
 
-const actualizarMedico = (req, res = response) => {
-    res.json({
-        ok: true,
-        msg: 'actualizarMedico'
-    })
+const actualizarMedico = async (req, res = response) => {
+
+    const id = req.params.id;
+    const uid = req.uid;
+    try {
+        const medico = await Medico.findById(id);
+
+        if (!medico) {
+            res.status(404).json({
+                ok: true,
+                msg: 'No existe ese id'
+            })
+        }
+
+        const cambiosMedico = {
+            ...req.body,
+            usuario: uid
+        }
+
+        constmedicoActualizado = await Medico.findByIdAndUpdate(id, cambiosMedico, {new: true});
+
+        res.json({
+            ok: true,
+            constmedicoActualizado
+        })
+    } catch (e) {
+        res.status(500).json({
+            ok: true,
+            msg: 'Hable con el administrador'
+        })
+    }
 }
 
-const borrarMedico = (req, res = response) => {
-    res.json({
-        ok: true,
-        msg: 'borrarMedico'
-    })
-}
+const borrarMedico = async (req, res = response) => {
+    const id = req.params.id;
 
+    try {
+
+        const hospital = await Medico.findById(id);
+
+        if (!hospital) {
+            res.status(404).json({
+                ok: true,
+                msg: 'No existe ese id'
+            })
+        }
+
+        await Medico.findByIdAndDelete(id);
+
+        res.json({
+            ok: true,
+            msg: 'Registro eliminado'
+        })
+    } catch (e) {
+        res.status(500).json({
+            ok: true,
+            msg: 'Hable con el administrador'
+        })
+    }
+}
 
 
 module.exports = {
