@@ -46,8 +46,7 @@ const getDocumentosColeccion = async (req, res = response) => {
             break;
 
         case 'usuarios':
-            data = await Usuario.find({name: regex});
-
+            data = await Usuario.find({$or: [{name: regex}, {email: regex}]});
             break;
 
         default:
