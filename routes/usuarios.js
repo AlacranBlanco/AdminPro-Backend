@@ -1,32 +1,34 @@
 /*
     Ruta: /api/usuarios
 */
-const { Router } = require('express');
-const { body } = require('express-validator');
-const { validarCampos } = require('../middlewares/validar-campos');
+const {Router} = require('express');
+const {body} = require('express-validator');
+const {validarCampos} = require('../middlewares/validar-campos');
 
-const { getUsuarios, crearUsuario, actualizarUsuario, borrarUsuario } = require('../controllers/usuarios');
-const { validarJWT } = require('../middlewares/validar-jwt');
+const {getUsuarios, crearUsuario, actualizarUsuario, borrarUsuario} = require('../controllers/usuarios');
+const {validarADMRole, validarADMRoleOMismoUsuario, validarJWT} = require('../middlewares/validar-jwt');
 
 
 const router = Router();
 
 
-router.get( '/', validarJWT , getUsuarios );
+router.get('/', validarJWT, getUsuarios);
 
-router.post( '/',
+router.post('/',
     [
+        validarADMRole,
         body('name', 'El nombre es obligatorio').not().isEmpty(),
         body('password', 'El password es obligatorio').not().isEmpty(),
         body('email', 'El email es obligatorio').isEmail(),
         validarCampos,
-    ], 
-    crearUsuario 
+    ],
+    crearUsuario
 );
 
-router.put( '/:id',
+router.put('/:id',
     [
         validarJWT,
+        validarADMRoleOMismoUsuario,
         body('name', 'El nombre es obligatorio').not().isEmpty(),
         body('email', 'El email es obligatorio').isEmail(),
         body('role', 'El role es obligatorio').not().isEmpty(),
@@ -35,11 +37,10 @@ router.put( '/:id',
     actualizarUsuario
 );
 
-router.delete( '/:id',
-    validarJWT,
+router.delete('/:id',
+    [validarADMRole, validarJWT],
     borrarUsuario
 );
-
 
 
 module.exports = router;
